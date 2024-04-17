@@ -3,8 +3,8 @@
 	Si no hay elemento nos retorna -1
 */
 const nombres = ['Carlos', 'Rafael', 'Estefania', 'Rodrigo', 'Rafael', 'Gema', 'Diana', 'Sara'];
-console.log(nombres.indexOf('Rafael')); // 1
-console.log(nombres.indexOf('Sergio')); // -1
+// console.log(nombres.indexOf('Rafael')); // 1
+// console.log(nombres.indexOf('Sergio')); // -1
 
 /* 
 	📌 .lastIndexOf() 
@@ -17,7 +17,7 @@ console.log(nombres.lastIndexOf('Rafael')); // 4
 	Nos permite ejecutar una funcion por cada elemento
 */
 nombres.forEach((nombre, index) => {
-	console.log(`Hola ${nombre} (index: ${index})`);
+	// console.log(`Hola ${nombre} (index: ${index})`);
 });
 
 /* 
@@ -27,14 +27,16 @@ nombres.forEach((nombre, index) => {
 // Ejemplo donde obtenemos el primer nombre que empiece por una letra.
 const letra = 'E';
 const resultado = nombres.find((nombre) => {
-	// Por cada elemento del arreglo ejecutamos la funcion
+		// Por cada elemento del arreglo ejecutamos la funcion
 	// Si la primera letra de un dia empieza por A lo devolvemos.
 
 	if (nombre[0] === letra) {
 		return nombre;
 	}
 });
-console.log(resultado);
+// console.log(resultado);
+
+
 
 /* 
 	📌 .map()
@@ -46,9 +48,10 @@ const nombresMayusculas = nombres.map((nombre) => {
 	return nombre.toUpperCase();
 });
 
+
 // Forma corta:
 //const nombresMayusculas = nombres.map((nombre) => nombre.toUpperCase());
-console.log(nombresMayusculas);
+// console.log(nombresMayusculas);
 
 /* 📌 .filter()
 	Nos permite ejecutar una funcion por cada elemento 
@@ -56,7 +59,7 @@ console.log(nombresMayusculas);
 */
 // Ejemplo: Crear un arreglo que contenga los nombres que tengan 4 letras.
 const nombres4Letras = nombres.filter((nombre) => {
-	if (nombre.length === 4) {
+	if (nombre.length === 7) {
 		return nombre;
 	}
 });
