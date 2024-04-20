@@ -22,3 +22,4 @@ const plantilla = `
 // Luego a la propiedad body.
 // Luego a la propiead innerHTML y le establecemos la plantilla.
 document.body.innerHTML = plantilla;
+
