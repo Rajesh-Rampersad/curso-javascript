@@ -1,2 +1,2 @@
-'use strict';
-console.log('Hola mundo!');
+import './cargarCategorias';
+import './eventoCategorias';
