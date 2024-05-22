@@ -1,6 +1,6 @@
 'use strict';
 
-var dataFotos = {
+var data = {
 	fotos: {
 		america: [
 			{
@@ -431,7 +431,7 @@ var dataFotos = {
 	},
 };
 
-const { fotos } = dataFotos;
+const { fotos } = data;
 
 var dataCategorias = {
 	categorias: [
@@ -477,28 +477,210 @@ categorias.forEach((categoria) => {
 	contenedorCategorias$1.append(nuevaCategoria);
 });
 
-const contenedorCategorias = document.getElementById('categorias');
-const galeria = document.getElementById('galeria');
+const galeria$4 = document.getElementById('galeria');
 
+/**
+ * Funcion que se encarga de cargar la imagen activa.
+ * @param {String} id ID de la imagen
+ * @param {String} nombre Nombre o titulo de la imagen
+ * @param {String} ruta Ruta a la imagen
+ * @param {String} descripcion Descripcion de la imagen
+ */
+const cargarImagen = (id, nombre, ruta, descripcion) => {
+	galeria$4.querySelector('.galeria__imagen').dataset.idImagen = id;
+	galeria$4.querySelector('.galeria__titulo').innerText = nombre;
+	galeria$4.querySelector('.galeria__imagen').src = ruta;
+	galeria$4.querySelector('.galeria__descripcion-imagen-activa').innerText = descripcion;
+
+	// Eliminamos la clase active de cualquier slide.
+	galeria$4.querySelectorAll('.galeria__carousel-slide--active').forEach((elemento) => {
+		elemento.classList.remove('galeria__carousel-slide--active');
+	});
+
+	// Marcamos la imagen del carousel como activa.
+	const categoriaActual = galeria$4.dataset.categoria;
+	const fotos = data.fotos[categoriaActual];
+
+	let indexImagenActual;
+	// Recorremos las imagenes en busca de una que tenga el id de la imagen actual y obtenemos su index.
+	fotos.forEach((foto, index) => {
+		if (foto.id === id) {
+			indexImagenActual = index;
+		}
+	});
+
+	// Ponemos la clase active en el elemento que fue clickeado.
+	if (galeria$4.querySelectorAll('.galeria__carousel-slide').length > 0) {
+		galeria$4
+			.querySelectorAll('.galeria__carousel-slide')
+			[indexImagenActual].classList.add('galeria__carousel-slide--active');
+	}
+};
+
+const cargarAnteriorSiguiente = (direccion) => {
+	const categoriaActual = galeria$4.dataset.categoria;
+	const fotos = data.fotos[categoriaActual];
+
+	// Obtenemos el ID de la imagen actual y lo transformamos en un numero.
+	const idImagenActual = parseInt(galeria$4.querySelector('.galeria__imagen').dataset.idImagen);
+
+	let indexImagenActual;
+	// Recorremos las imagenes en busca de una que tenga el id de la imagen actual y obtenemos su index.
+	fotos.forEach((foto, index) => {
+		if (foto.id === idImagenActual) {
+			indexImagenActual = index;
+		}
+	});
+
+	if (direccion === 'siguiente') {
+		// Comprobamos si aun hay mas fotos despues de la actual
+		if (fotos[indexImagenActual + 1]) {
+			const { id, nombre, ruta, descripcion } = fotos[indexImagenActual + 1];
+			cargarImagen(id, nombre, ruta, descripcion);
+		}
+	} else if (direccion === 'anterior') {
+		// Comprobamos si aun hay mas fotos despues de la actual
+		if (fotos[indexImagenActual - 1]) {
+			const { id, nombre, ruta, descripcion } = fotos[indexImagenActual - 1];
+			cargarImagen(id, nombre, ruta, descripcion);
+		}
+	}
+};
+
+/**
+ * Archivo que se encarga del evento de las categorias.
+ */
+
+
+const contenedorCategorias = document.getElementById('categorias');
+const galeria$3 = document.getElementById('galeria');
+let categoriaActiva;
+
+// Agregamos el event listener a las categorias.
 contenedorCategorias.addEventListener('click', (e) => {
 	e.preventDefault();
 
+	// Comprobamos que lo que se le hace click contenga el data-categoria.
 	if (e.target.closest('a')) {
-		galeria.classList.add('galeria--active');
+		categoriaActiva = e.target.closest('a').dataset.categoria;
+		galeria$3.dataset.categoria = categoriaActiva;
+		// Obtenemos las fotos que corresponden a la categoria
+		const fotos = data.fotos[categoriaActiva];
+		const carousel = galeria$3.querySelector('.galeria__carousel-slides');
+
+		// Reiniciamos el carousel
+		carousel.innerHTML = '';
+
+		// Agregamos un overflow hidden al body.
 		document.body.style.overflow = 'hidden';
 
-		const categoriaActiva = e.target.dataset.categoria;
-		const fotos = dataFotos.fotos[categoriaActiva];
-		
-			
-		fotos.forEach((foto) => {
+		// Agregamos la clase active a la galeria.
+		galeria$3.classList.add('galeria--active');
+
+		// Tomamos la informacion de la primera imagen de la categoria y la cargamos en el DOM.
+		const { id, nombre, ruta, descripcion } = fotos[0];
+		cargarImagen(id, nombre, ruta, descripcion);
+
+		// Por cada foto agregamos un slide al carousel.
+		for (let i = 0; i < fotos.length; i++) {
 			const slide = `
-			<a href="#" class="galeria__carousel-slide">
-			<img  class="galeria__carousel-image" src="${foto.ruta}" alt="" />
-			</a>`;
-			galeria.querySelector('.galeria__carousel-slides').innerHTML += slide;
-		});
+				<a href="#" class="galeria__carousel-slide">
+					<img class="galeria__carousel-image" src="${fotos[i].ruta}" alt="" data-id-foto="${fotos[i].id}" />
+				</a>
+			`;
+
+			carousel.innerHTML += slide;
+		}
+
+		// Agregamos la clase active al primer elemento.
+		galeria$3.querySelector('.galeria__carousel-slide').classList.add('galeria__carousel-slide--active');
+	}
+});
+
+const galeria$2 = document.getElementById('galeria');
+
+const slideClick = (e) => {
+	// Obtenemos la categoria activa de la galeria.
+	const categoriaActiva = galeria$2.dataset.categoria;
+
+	// Obtenemos la ruta de la imagen accediendo al objeto de fotos y comparando el id del slide con el de las fotos.
+	let id;
+	let ruta;
+	let nombre;
+	let descripcion;
+
+	data.fotos[categoriaActiva].forEach((foto) => {
+		if (foto.id === parseInt(e.target.dataset.idFoto)) {
+			id = foto.id;
+			ruta = foto.ruta;
+			nombre = foto.nombre;
+			descripcion = foto.descripcion;
+		}
+	});
+
+	// Cargamos toda la informacion de la nueva imagen
+	cargarImagen(id, nombre, ruta, descripcion);
+};
+
+const galeria$1 = document.getElementById('galeria');
+
+const cerrarGaleria = () => {
+	// Agregamos un overflow hidden al body.
+	document.body.style.overflow = '';
+
+	// Agregamos la clase active a la galeria.
+	galeria$1.classList.remove('galeria--active');
+};
+
+/**
+ * Archivo que se encarga de administrar los eventos de la galeria.
+ */
+
+
+const galeria = document.getElementById('galeria');
+
+// Agregamos event listener a la galeria
+galeria.addEventListener('click', (e) => {
+	e.preventDefault();
+
+	const boton = e.target.closest('button');
+
+	// - - - CERRAR GALERIA
+	// Accedemos al boton mas cercano. Esto para evitar obtener el svg o path.
+	// Si tiene un dataset y un accion y es igual a cerrar-galeria, cerramos la galeria.
+	if (boton?.dataset?.accion === 'cerrar-galeria' || e.target?.dataset?.accion === 'cerrar-galeria') {
+		cerrarGaleria();
+	}
+
+	// - - - SIGUIENTE IMAGEN
+	if (boton?.dataset?.accion === 'siguiente-imagen') {
 		
-		galeria.querySelector('.galeria__carousel-slide').classList.add('galeria__carousel-slide--active');
+		cargarAnteriorSiguiente('siguiente');
+	}
+
+	// - - - ANTERIOR IMAGEN
+	if (boton?.dataset?.accion === 'anterior-imagen') {
+		
+		cargarAnteriorSiguiente('anterior');
+	}
+
+	// - - - CAROUSEL SLIDE CLICK
+	// Comprobamos si el elemento tiene un data set y se llama idFoto.
+	if (e.target?.dataset?.idFoto) {
+		slideClick(e);
+	}
+
+	// - - - CAROUSEL ADELANTE
+	// Comprobamos que el elemento clickeado sea un boton y tenga el data-action="siguiente-slide"
+	if (boton && boton?.dataset.accion === 'siguiente-slide') {
+		console.log('adelante');
+		carousel('adelante');
+	}
+
+	// - - - CAROUSEL ATRAS
+	// Comprobamos que el elemento clickeado sea un boton y tenga el data-action="anterior-slide"
+	if (boton && boton?.dataset.accion === 'anterior-slide') {
+		console.log('atras');
+		carousel('atras');
 	}
 });
